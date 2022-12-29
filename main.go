@@ -17,11 +17,13 @@ import (
 )
 
 var (
-	Token string
+	Token  string
+	Remove string
 )
 
 func init() {
 	flag.StringVar(&Token, "t", "", "discord bot token")
+	flag.StringVar(&Remove, "r", "", "remove command you want")
 	flag.Parse()
 	if Token == "" {
 		flag.Usage()
@@ -48,16 +50,17 @@ func main() {
 	session.AddHandler(messageHandler)
 	session.AddHandler(followupHandler)
 
-	registeredCmds := make([]*discordgo.ApplicationCommand, len(commands))
-	for i, v := range commands {
+	registeredCmds := make(map[string]*discordgo.ApplicationCommand, len(commands))
+	for _, v := range commands {
 		cmd, err := session.ApplicationCommandCreate(session.State.User.ID, "", v)
 		if err != nil {
 			log.Fatalf("Couldn't recognized current command %v", err)
 			return
 		}
-
-		registeredCmds[i] = cmd
+		registeredCmds[v.Name] = cmd
 	}
+
+	removeCommand(session, registeredCmds)
 
 	defer session.Close()
 
@@ -175,6 +178,24 @@ func followupHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if hook, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 		hook(s, i)
+	}
+
+}
+
+func removeCommand(s *discordgo.Session, appCmds map[string]*discordgo.ApplicationCommand) {
+
+	if Remove == "" {
+		return
+	}
+
+	if cmd, ok := appCmds[Remove]; ok {
+		err := s.ApplicationCommandDelete(s.State.User.ID, "", cmd.ID)
+		if err != nil {
+			fmt.Printf("Couldn't Remove app cmd that id %v", err)
+			return
+		}
+
+		fmt.Printf("Successfully command removed %v", cmd.Name)
 	}
 
 }
