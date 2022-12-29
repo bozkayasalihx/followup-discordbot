@@ -18,13 +18,16 @@ import (
 
 var (
 	Token  string
-	Remove string
+	remove string
+  disable string
 )
 
 func init() {
 	flag.StringVar(&Token, "t", "", "discord bot token")
-	flag.StringVar(&Remove, "r", "", "remove command you want")
+	flag.StringVar(&remove, "r", "", "remove command you want")
+  flag.StringVar(&disable, "d", "", "disable all comands")
 	flag.Parse()
+
 	if Token == "" {
 		flag.Usage()
 		return
@@ -50,7 +53,9 @@ func main() {
 	session.AddHandler(messageHandler)
 	session.AddHandler(followupHandler)
 
+
 	registeredCmds := make(map[string]*discordgo.ApplicationCommand, len(commands))
+
 	for _, v := range commands {
 		cmd, err := session.ApplicationCommandCreate(session.State.User.ID, "", v)
 		if err != nil {
@@ -184,11 +189,11 @@ func followupHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 func removeCommand(s *discordgo.Session, appCmds map[string]*discordgo.ApplicationCommand) {
 
-	if Remove == "" {
+	if remove == "" {
 		return
 	}
 
-	if cmd, ok := appCmds[Remove]; ok {
+	if cmd, ok := appCmds[remove]; ok {
 		err := s.ApplicationCommandDelete(s.State.User.ID, "", cmd.ID)
 		if err != nil {
 			fmt.Printf("Couldn't Remove app cmd that id %v", err)
@@ -197,5 +202,19 @@ func removeCommand(s *discordgo.Session, appCmds map[string]*discordgo.Applicati
 
 		fmt.Printf("Successfully command removed %v", cmd.Name)
 	}
+
+}
+
+func disableCommands(s *discordgo.Session, appCmds map[string]*discordgo.ApplicationCommand) { 
+  if disable == "" {
+    log.Fatalf("Must be different than empty string")
+    return;
+  }
+  
+  test := "followups"
+  if cmd, ok := appCmds[test]; ok {
+    fmt.Printf("You're Valid to go %v", cmd.ApplicationID);
+   
+  }
 
 }
