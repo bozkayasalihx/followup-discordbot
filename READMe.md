@@ -10,6 +10,10 @@ simple way to interact with discord-bot using `GO`
 
     go build -o discordbot && ./discordbot -t BOT_TOKEN
 
+    for more settings options type 
+
+    go run . 
+
 ## License
 
 
