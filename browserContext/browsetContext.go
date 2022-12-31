@@ -34,7 +34,8 @@ func Login(pw *playwright.Playwright) <-chan []*playwright.BrowserContextCookies
 			lock.Unlock()
 		})
 
-		//lock.Lock()
+		lock.Lock()
+
 		cookies, err := browser.Cookies(Twitter)
 		if err != nil {
 			log.Fatalf("Couldn't get cookie from home %v", err)
