@@ -3,9 +3,12 @@ package main
 import (
 	"bufio"
 	browsercontext "discord-bot/browserContext"
+	"discord-bot/handler"
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/playwright-community/playwright-go"
 )
@@ -34,10 +37,19 @@ import (
 // }
 
 func main() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT, syscall.SIGSEGV)
+
+	go func() {
+		for {
+			s := <-c
+			handler.Handler(s)
+		}
+	}()
 
 	err := playwright.Install(&playwright.RunOptions{
-		Browsers: []string{"chromium"},
 		Verbose:  true,
+		Browsers: []string{"chromium"},
 	})
 	if err != nil {
 		log.Fatalf("Couldn't install browser %v", err)
@@ -49,15 +61,11 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("Could Run playwight %v", err)
+		log.Fatalf("Couldn't Run playwight %v", err)
 	}
 
 	browser, page := browsercontext.LaunchBrowser(pw, browsercontext.AuthTwitter, true)
-	loggedIn := browsercontext.IsLoggedin(page)
-	fmt.Printf("logged in %v", loggedIn)
-
 	for !browsercontext.IsLoggedin(page) {
-
 		cookies := <-browsercontext.Login(pw)
 
 		for _, cookie := range cookies {
@@ -76,15 +84,12 @@ func main() {
 
 		}
 
-		for _, cookie := range cookies {
-			fmt.Println(cookie.Name, cookie.Value)
-		}
-
-		_, err = page.Goto(browsercontext.Twitter)
+		_, err = page.Goto("https://chat.openai.com/chat")
 		if err != nil {
 			log.Fatalf("Couldnt go to %v err: %v", browsercontext.Twitter, err)
 		}
 
+		fmt.Printf("current path is: %v", page.URL())
 		image, err := page.Screenshot()
 		if err != nil {
 			log.Fatalf("Couldt take screenshot form twitter %v", err)
@@ -106,13 +111,14 @@ func main() {
 	if err := browser.Close(); err != nil {
 		log.Printf("Couldn't Shutdown the browser %v", err)
 	}
-	if err := os.RemoveAll("/tmp/twitter"); err != nil {
-		log.Printf("Couldn't remove /temp/twitter %v", err)
+
+	if err := pw.Stop(); err != nil {
+		log.Printf("pw Couldn't stopped %v", err)
 	}
 
 	// session, err := discordgo.New("Bot " + Token)
 	// if err != nil {
-	// 	log.Fatalln("Couldn't start new session")
+	// 	log.Fatalln("Couldn't start new session"
 	// }
 
 	// err = session.Open()

@@ -10,10 +10,10 @@ import (
 
 // const Twitter = "https://twitter.com/home"
 const Twitter = "https://twitter.com/home"
-const AuthTwitter = "https://twitter.com/i/flow/login"
+const AuthTwitter = "https://chat.openai.com/auth/login"
 
 func IsLoggedin(page playwright.Page) bool {
-	return page.URL() == "https://twitter.com/home"
+	return page.URL() == "https://chat.openai.com/chat"
 }
 
 func Login(pw *playwright.Playwright) <-chan []*playwright.BrowserContextCookiesResult {
@@ -28,7 +28,7 @@ func Login(pw *playwright.Playwright) <-chan []*playwright.BrowserContextCookies
 		log.Println("Login with twitter account please!")
 
 		page.On("framenavigated", func(frame playwright.Frame) {
-			if frame.URL() != "https://twitter.com/home" {
+			if frame.URL() != "https://chat.openapi.com/chat" {
 				return
 			}
 			lock.Unlock()

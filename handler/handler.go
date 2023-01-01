@@ -16,7 +16,7 @@ func Handler(signal os.Signal) {
 		}
 
 		os.Exit(1)
-		fmt.Println("succesfullly removed /tmp/twitter")
+		fmt.Println("succesfullly removed /")
 	}
 
 }
