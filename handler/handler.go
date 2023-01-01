@@ -14,9 +14,8 @@ func Handler(signal os.Signal) {
 			os.Exit(0)
 			return
 		}
-
-		os.Exit(1)
 		fmt.Println("succesfullly removed /")
+		os.Exit(1)
 	}
 
 }

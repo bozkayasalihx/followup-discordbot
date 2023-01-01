@@ -8,13 +8,12 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-// const Twitter = "https://twitter.com/home"
-const Twitter = "https://twitter.com/home"
-const AuthTwitter = "https://chat.openai.com/auth/login"
-
 func IsLoggedin(page playwright.Page) bool {
 	return page.URL() == "https://chat.openai.com/chat"
 }
+
+var chatgptAuth string = "https://chat.openapi.com/auth/login"
+var homeChatgpt string = "https://chat.openapi.com/chat"
 
 func Login(pw *playwright.Playwright) <-chan []*playwright.BrowserContextCookiesResult {
 	var lock sync.Mutex
@@ -23,12 +22,12 @@ func Login(pw *playwright.Playwright) <-chan []*playwright.BrowserContextCookies
 	go func() {
 		defer close(r)
 		defer lock.Unlock()
-		browser, page := LaunchBrowser(pw, AuthTwitter, false)
+		browser, page := LaunchBrowser(pw, homeChatgpt, false)
 
-		log.Println("Login with twitter account please!")
+		log.Println("Login with openapi account please!")
 
 		page.On("framenavigated", func(frame playwright.Frame) {
-			if frame.URL() != "https://chat.openapi.com/chat" {
+			if frame.URL() != homeChatgpt {
 				return
 			}
 			lock.Unlock()
@@ -36,7 +35,7 @@ func Login(pw *playwright.Playwright) <-chan []*playwright.BrowserContextCookies
 
 		lock.Lock()
 
-		cookies, err := browser.Cookies(Twitter)
+		cookies, err := browser.Cookies(homeChatgpt)
 		if err != nil {
 			log.Fatalf("Couldn't get cookie from home %v", err)
 		}

@@ -78,7 +78,7 @@ func main() {
 		log.Fatalf("Couldn't Run playwight %v", err)
 	}
 
-	browser, page := browsercontext.LaunchBrowser(pw, browsercontext.AuthTwitter, true)
+	browser, page := browsercontext.LaunchBrowser(pw, "https://chat.openapi.com/auth/login", true)
 	for !browsercontext.IsLoggedin(page) {
 		cookies := <-browsercontext.Login(pw)
 
@@ -100,7 +100,7 @@ func main() {
 
 		_, err = page.Goto("https://chat.openai.com/chat")
 		if err != nil {
-			log.Fatalf("Couldnt go to %v err: %v", browsercontext.Twitter, err)
+			log.Fatalf("Couldnt go to %v err: %v", "https://chat.openai.com/chat", err)
 		}
 
 		fmt.Printf("current path is: %v", page.URL())
