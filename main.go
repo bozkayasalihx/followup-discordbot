@@ -4,6 +4,7 @@ import (
 	"bufio"
 	browsercontext "discord-bot/browserContext"
 	"discord-bot/handler"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -35,6 +36,19 @@ import (
 // 	}
 
 // }
+
+var sessionToken string
+
+func init() {
+	flag.StringVar(&sessionToken, "s", "", "chatgpt sessino token")
+	flag.Parse()
+
+	if sessionToken == "" {
+		log.Fatalln("Couldn't move without setting up to session token")
+		return
+	}
+
+}
 
 func main() {
 	c := make(chan os.Signal, 1)
